@@ -70,8 +70,7 @@ window.TruncateLongString = function (str, n, useWordBoundary) {
 };
 
 Handlebars.registerHelper('formatTime', function (date, format) {
-  const mmnt = moment(date);
-  return mmnt.format(format);
+  return dayjs(date).format(format);
 });
 
 Handlebars.registerHelper('ifCond', function (v1, v2, options) {

@@ -98,68 +98,35 @@ function SaveData(action, form_json) {
   if (!mutation)
     return;
 
-  $.ajax({
-    beforeSend: function () {
-      $('#msg-error').addClass('d-none');
-    },
-    contentType: 'application/json',
-    url: mainHost, type: 'post',
-    data: JSON.stringify({ query: mutation, variables: form_json }),
-    success: function (res) {
-      // console.log('success', res);
-      if (!res)
-        return;
-
-      if (res.errors) {
-        $('#msg-error').removeClass('d-none').find('.text-danger').html(res.errors[0].message);
-        return;
-      }
-
-      if (res.data) {
-        formHelper.closeForm();
-        table_js.ajax.reload();
-      }
-    },
-    error: function (ex) {
-      console.log('Error', ex);
-    }
+  $('#msg-error').addClass('d-none');
+  ApiService.query(mutation, form_json).then(function(data) {
+    formHelper.closeForm();
+    table_js.ajax.reload();
+  }).catch(function(err) {
+    $('#msg-error').removeClass('d-none').find('.text-danger').html(err.message || 'Request failed');
   });
 };
 
 function GetPosts() {
-  return new Promise(function (resolve, reject) {
-    $.ajax({
-      contentType: 'application/json',
-      url: mainHost, type: 'post',
-      data: JSON.stringify({ query: queryPosts }),
-      success: function (res) {
-        preloadData.posts = res.data.posts;
-        resolve();
-      },
-      error: function (ex) {
-        // console.log('Error', ex);
-        preloadData.posts = [];
-        resolve();
-      }
+  return new Promise(function(resolve) {
+    ApiService.query(queryPosts).then(function(data) {
+      preloadData.posts = data.posts;
+      resolve();
+    }).catch(function() {
+      preloadData.posts = [];
+      resolve();
     });
   });
 };
 
 function GetUsers() {
-  return new Promise(function (resolve, reject) {
-    $.ajax({
-      contentType: 'application/json',
-      url: mainHost, type: 'post',
-      data: JSON.stringify({ query: queryUsers }),
-      success: function (res) {
-        preloadData.users = res.data.authors;
-        resolve();
-      },
-      error: function (ex) {
-        // console.log('Error', ex);
-        preloadData.users = [];
-        resolve();
-      }
+  return new Promise(function(resolve) {
+    ApiService.query(queryUsers).then(function(data) {
+      preloadData.users = data.authors;
+      resolve();
+    }).catch(function() {
+      preloadData.users = [];
+      resolve();
     });
   });
 };
@@ -205,21 +172,12 @@ window.ConfirmDelete = function (indx) {
 
 window.InitPage = function (arrContent) {
   table_js = $('#dataTable').DataTable({
-    'ajax': function (data, callback, settings) {
-      // console.log(data, callback, settings);
-
-      $.ajax({
-        url: mainHost,
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({ query }),
-        complete: function (res, status) {
-          // console.log(res.responseJSON.data.posts, status)
-          var result = { data: [] }
-          if (status === 'success')
-            result.data = res.responseJSON.data && res.responseJSON.data.comments;
-          callback(result);
-        }
+    'ajax': function(data, callback, settings) {
+      ApiService.queryAjax(query).then(function(res) {
+        var result = { data: res.data && res.data.comments };
+        callback(result);
+      }).catch(function() {
+        callback({ data: [] });
       });
     },
     'columns': [

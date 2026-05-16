@@ -85,31 +85,12 @@ function SaveData(action, form_json) {
     return;
 
   form_json.points = parseInt(form_json.points);
-  $.ajax({
-    beforeSend: function () {
-      $('#msg-error').addClass('d-none');
-    },
-    contentType: 'application/json',
-    url: mainHost, type: 'post',
-    data: JSON.stringify({ query: mutation, variables: form_json }),
-    success: function (res) {
-      // console.log('success', res);
-      if (!res)
-        return;
-
-      if (res.errors) {
-        $('#msg-error').removeClass('d-none').find('.text-danger').html(res.errors[0].message);
-        return;
-      }
-
-      if (res.data) {
-        formHelper.closeForm();
-        table_js.ajax.reload();
-      }
-    },
-    error: function (ex) {
-      console.log('Error', ex);
-    }
+  $('#msg-error').addClass('d-none');
+  ApiService.query(mutation, form_json).then(function(data) {
+    formHelper.closeForm();
+    table_js.ajax.reload();
+  }).catch(function(err) {
+    $('#msg-error').removeClass('d-none').find('.text-danger').html(err.message || 'Request failed');
   });
 };
 
@@ -151,46 +132,31 @@ window.ConfirmDelete = function (indx) {
 };
 
 function GetUser(id) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve) {
     if (!id) {
       preloadData.user = {};
       resolve();
       return;
     }
 
-    $.ajax({
-      contentType: 'application/json',
-      url: mainHost, type: 'post',
-      data: JSON.stringify({ query: getById, variables: { id } }),
-      success: function (res) {
-        preloadData.user = res.data.author;
-        resolve();
-      },
-      error: function (ex) {
-        // console.log('Error', ex);
-        preloadData.user = {};
-        resolve();
-      }
+    ApiService.query(getById, { id: id }).then(function(data) {
+      preloadData.user = data.author;
+      resolve();
+    }).catch(function() {
+      preloadData.user = {};
+      resolve();
     });
   });
 };
 
 window.InitPage = function (arrContent) {
   table_js = $('#dataTable').DataTable({
-    'ajax': function (data, callback, settings) {
-      // console.log(data, callback, settings);
-      $.ajax({
-        url: mainHost,
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({ query }),
-        complete: function (res, status) {
-          // console.log(res.responseJSON.data.posts, status)
-          const result = { data: [] }
-          if (status === 'success')
-            result.data = res.responseJSON.data && res.responseJSON.data.authors;
-          callback(result);
-        }
+    'ajax': function(data, callback, settings) {
+      ApiService.queryAjax(query).then(function(res) {
+        var result = { data: res.data && res.data.authors };
+        callback(result);
+      }).catch(function() {
+        callback({ data: [] });
       });
     },
     'columns': [
