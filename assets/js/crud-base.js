@@ -31,7 +31,7 @@ window.CrudBase = function(config) {
     }
 
     if (!isValid) {
-      $('#msg-error').removeClass('d-none').find('.text-danger').html('Invalid data');
+      Swal.fire({ icon: 'warning', title: 'Invalid Data', text: 'Please fill in the required fields.' });
       return;
     }
 
@@ -46,12 +46,13 @@ window.CrudBase = function(config) {
 
     form_json = transformPayload(form_json);
 
-    $('#msg-error').addClass('d-none');
+    Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
     ApiService.query(mutation, form_json).then(function(data) {
       self.formHelper.closeForm();
+      Swal.fire({ icon: 'success', title: 'Success', text: 'Record saved successfully.', timer: 2000, showConfirmButton: false });
       window.table_js.ajax.reload();
     }).catch(function(err) {
-      $('#msg-error').removeClass('d-none').find('.text-danger').html(err.message || 'Request failed');
+      Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Request failed' });
     });
   }
 

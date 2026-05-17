@@ -113,7 +113,7 @@ const config = window.APP_CONFIG;
         return;
       }
 
-      alert('Invalid password.');
+      Swal.fire({ icon: 'error', title: 'Login Failed', text: 'Invalid password.' });
     });
 
     if (location.pathname.toLowerCase() !== login_page &&

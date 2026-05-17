@@ -17,7 +17,7 @@ window.APP_CONFIG = {
       'https://admin-lte-cdn.surge.sh/plugins/datatables-responsive/js/dataTables.responsive.min.js',
       'https://admin-lte-cdn.surge.sh/plugins/datatables-responsive/js/responsive.bootstrap4.min.js',
     ],
-    EXTRA_LIBS: 'https://cdn.jsdelivr.net/combine/npm/accounting-js@1.1.1/dist/accounting.umd.min.js,npm/dayjs@1.11.13/dayjs.min.js,npm/dayjs@1.11.13/plugin/customParseFormat.min.js',
+    EXTRA_LIBS: 'https://cdn.jsdelivr.net/combine/npm/accounting-js@1.1.1/dist/accounting.umd.min.js,npm/dayjs@1.11.13/dayjs.min.js,npm/dayjs@1.11.13/plugin/customParseFormat.min.js,npm/sweetalert2@11',
   },
 
   LOGIN_PATH: '/pages/login',
