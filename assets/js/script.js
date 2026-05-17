@@ -163,7 +163,7 @@ const config = window.APP_CONFIG;
 
   loadScriptsSequentially(coreLibs).then(function() {
     if (Array.isArray(window.addition_libs) && window.addition_libs.length > 0) {
-      return Promise.all(window.addition_libs.map(function(item) { return loadScript(item); }));
+      return loadScriptsSequentially(window.addition_libs);
     }
   }).then(function() {
     Main();
