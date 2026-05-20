@@ -86,10 +86,17 @@ window.CrudBase = function(config) {
   };
 
   this.initPage = function(arrContent) {
+    var imageField = config.imageField;
+
     window.table_js = $('#dataTable').DataTable($.extend({}, config.tableOptions, {
       ajax: function(data, callback, settings) {
         ApiService.queryAjax(queries.list).then(function(res) {
-          callback({ data: res.data ? res.data[dataPath] : [] });
+          var rows = res.data ? res.data[dataPath] : [];
+          if (imageField && typeof PreloadImages === 'function') {
+            var urls = rows.map(function(r) { return r[imageField]; }).filter(Boolean);
+            PreloadImages(urls);
+          }
+          callback({ data: rows });
         }).catch(function() {
           callback({ data: [] });
         });

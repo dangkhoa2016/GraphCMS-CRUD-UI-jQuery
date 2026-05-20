@@ -96,3 +96,37 @@ Handlebars.registerHelper('select', function (value, options) {
 
   return select.innerHTML;
 });
+
+// --- Image preloading with fallback ---
+window.IMAGE_FALLBACK = '/assets/images/default.jpg';
+
+window.PreloadImages = function(urls) {
+  if (!urls || !urls.length) return Promise.resolve();
+  var promises = urls.filter(Boolean).map(function(url) {
+    return new Promise(function(resolve) {
+      var img = new Image();
+      img.onload = function() { resolve(url); };
+      img.onerror = function() { resolve(null); };
+      img.src = url;
+    });
+  });
+  return Promise.all(promises);
+};
+
+window.HandleImageFallback = function(img) {
+  img.onerror = null;
+  img.src = window.IMAGE_FALLBACK;
+};
+
+window.HandleImageLoad = function(img) {
+  if (!img.naturalWidth) window.HandleImageFallback(img);
+};
+
+window.RenderImageWithFallback = function(src, alt, width, height) {
+  var w = width ? 'width="' + width + '" ' : '';
+  var h = height ? 'height="' + height + '" ' : '';
+  return '<img src="' + src + '" alt="' + alt + '" ' + w + h +
+    ' onload="window.HandleImageLoad(this)"' +
+    ' onerror="window.HandleImageFallback(this)"' +
+    ' />';
+};

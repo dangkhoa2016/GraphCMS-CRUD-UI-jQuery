@@ -70,6 +70,7 @@
         });
       }
     ],
+    imageField: 'photo',
     getEditData: function(rowData, preloadData) {
       rowData.users = preloadData.users;
       rowData.content = (preloadData.post.content || {}).text;
@@ -87,7 +88,11 @@
       },
       {
         'data': 'photo', render: function(data, type, row) {
-          return `<img src='${row['photo']}' alt='${row['title']}' />`;
+          if (type === 'display') {
+            var src = row['photo'] || window.IMAGE_FALLBACK;
+            return RenderImageWithFallback(src, row['title'] || '', '', '');
+          }
+          return data;
         }
       },
       {
