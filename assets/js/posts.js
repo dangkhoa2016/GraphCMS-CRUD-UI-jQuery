@@ -7,7 +7,7 @@
       '  posts {\n' +
       '    id,photo,state,title,summary\n' +
       '    updatedAt,createdAt\n' +
-      '    author {id,name,email}\n' +
+      '    author {id,name,email,state}\n' +
       '  }\n' +
       '}',
     getById:
@@ -15,7 +15,7 @@
       '  post(where: {id: $id}) {\n' +
       '    id,photo,state,title,summary,content {text}\n' +
       '    updatedAt,createdAt\n' +
-      '    author {id,name,email}\n' +
+      '    author {id,name,email,state}\n' +
       '  }\n' +
       '}',
     queryUsers:
@@ -80,7 +80,21 @@
       return { status: 'active', users: preloadData.users };
     },
     columns: [
-      { 'data': 'title' },
+      {
+        'data': 'title', render: function(data, type, row) {
+          if (type === 'display') {
+            var badge;
+            switch (row.state) {
+              case 'active':   badge = '<span class="badge badge-success">Published</span>'; break;
+              case 'draft':    badge = '<span class="badge badge-secondary">Draft</span>'; break;
+              case 'disabled': badge = '<span class="badge badge-danger">Disabled</span>'; break;
+              default:         badge = '';
+            }
+            return data + '<br/>' + badge;
+          }
+          return data;
+        }
+      },
       {
         'data': 'summary', render: function(data, type, row) {
           return TruncateLongString(row['summary'], 100, true);
@@ -97,8 +111,19 @@
       },
       {
         'data': 'author', render: function(data, type, row) {
-          return 'Name: ' + row['author']['name'] +
-            '<br/>' + 'Email: ' + row['author']['email'];
+          if (type === 'display') {
+            var authorState = row['author'].state;
+            var badge;
+            switch (authorState) {
+              case 'active':   badge = '<span class="badge badge-success">Active</span>'; break;
+              case 'disabled': badge = '<span class="badge badge-secondary">Inactive</span>'; break;
+              default:         badge = '';
+            }
+            return 'Name: ' + row['author']['name'] +
+              '<br/>' + 'Email: ' + row['author']['email'] +
+              '<br/>' + badge;
+          }
+          return data;
         }
       },
       {

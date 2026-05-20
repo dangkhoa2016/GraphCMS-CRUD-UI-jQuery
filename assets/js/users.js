@@ -76,8 +76,28 @@
       return { points: 0, state: 'active' };
     },
     columns: [
-      { 'data': 'name' },
-      { 'data': 'email' },
+      {
+        'data': 'name', render: function(data, type, row) {
+          if (type === 'display') {
+            var badge = row.state === 'active'
+              ? '<span class="badge badge-success">Active</span>'
+              : '<span class="badge badge-secondary">Inactive</span>';
+            return data + '<br/>' + badge;
+          }
+          return data;
+        }
+      },
+      {
+        'data': 'email', render: function(data, type, row) {
+          if (type === 'display') {
+            var badge = row.state === 'active'
+              ? '<span class="badge badge-success">Active</span>'
+              : '<span class="badge badge-secondary">Inactive</span>';
+            return data + '<br/>' + badge;
+          }
+          return data;
+        }
+      },
       {
         'data': 'posts.length', render: function(data, type, row) {
           return accounting.formatNumber(row['posts'].length);

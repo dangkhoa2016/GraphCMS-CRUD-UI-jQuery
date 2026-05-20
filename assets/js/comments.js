@@ -7,10 +7,10 @@
       '  comments {\n' +
       '    id,comment,state,createdAt,updatedAt\n' +
       '    post {\n' +
-      '      id,title\n' +
+      '      id,title,state\n' +
       '    }\n' +
       '    author {\n' +
-      '      id,name,email\n' +
+      '      id,name,email,state\n' +
       '    }\n' +
       '  }\n' +
       '}',
@@ -78,16 +78,47 @@
     columns: [
       {
         'data': 'comment', render: function(data, type, row) {
-          return TruncateLongString(row['comment'], 100, true);
+          if (type === 'display') {
+            var badge;
+            switch (row.state) {
+              case 'active':   badge = '<span class="badge badge-success">Active</span>'; break;
+              case 'draft':    badge = '<span class="badge badge-secondary">Draft</span>'; break;
+              case 'disabled': badge = '<span class="badge badge-danger">Disabled</span>'; break;
+              default:         badge = '';
+            }
+            return TruncateLongString(row['comment'], 100, true) + '<br/>' + badge;
+          }
+          return data;
         }
       },
       {
-        'data': 'post.title'
+        'data': 'post.title', render: function(data, type, row) {
+          if (type === 'display') {
+            var postState = row['post'].state;
+            var badge;
+            switch (postState) {
+              case 'active':   badge = '<span class="badge badge-success">Published</span>'; break;
+              case 'draft':    badge = '<span class="badge badge-secondary">Draft</span>'; break;
+              case 'disabled': badge = '<span class="badge badge-danger">Disabled</span>'; break;
+              default:         badge = '';
+            }
+            return data + '<br/>' + badge;
+          }
+          return data;
+        }
       },
       {
         'data': 'author', render: function(data, type, row) {
-          return 'Name: ' + row['author']['name'] +
-            '<br/>' + 'Email: ' + row['author']['email'];
+          if (type === 'display') {
+            var authorState = row['author'].state;
+            var badge = authorState === 'active'
+              ? '<span class="badge badge-success">Active</span>'
+              : '<span class="badge badge-secondary">Inactive</span>';
+            return 'Name: ' + row['author']['name'] +
+              '<br/>' + 'Email: ' + row['author']['email'] +
+              '<br/>' + badge;
+          }
+          return data;
         }
       },
       {
