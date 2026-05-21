@@ -15,8 +15,13 @@
   <link rel='stylesheet' href='https://admin-lte-cdn.surge.sh/plugins/icheck-bootstrap/icheck-bootstrap.min.css' />
   <!-- Theme style -->
   <link rel='stylesheet' href='https://admin-lte-cdn.surge.sh/dist/css/adminlte.min.css' />
+  <style>
+    #body.swal2-height-auto {
+      height: 100vh !important;
+    }
+  </style>
 </head>
-<body class='hold-transition login-page'>
+<body id="body" class='hold-transition login-page'>
   <div class='login-box'>
     <!-- /.login-logo-->
     <div class='card card-outline card-primary'>
@@ -79,8 +84,6 @@
   </div>
   <!-- /.login-box-->
 
-  <!-- REQUIRED SCRIPTS -->
-	<script src='https://cdn.jsdelivr.net/combine/npm/jquery@3.6.3,npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js,npm/handlebars@4.7.7/dist/handlebars.min.js'></script>
-
+  <script src='/assets/js/config.js'></script>
 	<script src='/assets/js/script.js'></script>
 </body>
